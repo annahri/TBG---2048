@@ -13,7 +13,6 @@ namespace TBG___2048
 
         public Game()
         {
-
             Initiate(Dimension, 4);
             GiveNumbers(Dimension, new int[] { 2, 4 }, 2);
 
@@ -21,6 +20,10 @@ namespace TBG___2048
             Console.Write("  Press the arrow key...");
         }
 
+        /// <summary>
+        /// Check if the game is over.
+        /// </summary>
+        /// <returns>If no moves left, returns true, otherwise false.</returns>
         private bool IsOver()
         {
             for (int i = 0; i < 4; i++) {
@@ -34,6 +37,11 @@ namespace TBG___2048
             return true;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
         private void Initiate(int[][] array, int val)
         {
             for (int i = 0; i < val; i++) {
@@ -63,9 +71,15 @@ namespace TBG___2048
 
         }
 
-        private void SumNumbers(int[] array, bool reversed)
+        /// <summary>
+        /// Find the sum in a array.
+        /// Counts from left to right / right to left based on 
+        /// </summary>
+        /// <param name="array">Desired array.</param>
+        /// <param name="istrue">If true, counts from left to right and vice versa.</param>
+        private void SumNumbers(int[] array, bool istrue)
         {
-            if (!reversed) {
+            if (!istrue) {
                 for (int i = array.Length - 1; i > 0; i--) {
                     if (array[i] == array[i - 1]) {
                         int sum = array[i] + array[i - 1];
@@ -86,6 +100,12 @@ namespace TBG___2048
             }
         }
 
+        /// <summary>
+        /// Compares 
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <returns></returns>
         private bool Compare(int[][] array1, int[][] array2)
         {
             for (int i = 0; i < 4; i++) {
@@ -104,6 +124,11 @@ namespace TBG___2048
             return nonZeros.Concat(Enumerable.Repeat(0, amountofZeros)).ToArray();
         }
         
+        /// <summary>
+        /// Move the numbers based on keypress.
+        /// </summary>
+        /// <param name="direction">LEFT, UP, RIGHT, DOWN</param>
+        /// <returns>Returns true if it moves.</returns>
         private bool Move(string direction = "LEFT")
         {
             bool reversed = false;
@@ -134,13 +159,9 @@ namespace TBG___2048
             }
 
             bool equal = Compare(oldArray, Dimension);
-            if (equal) {
-                GiveNumbers(Dimension, new int[] { 2 }, 1);
-            }
+            if (equal) GiveNumbers(Dimension, new int[] { 2 }, 1);
 
-            if (reversed) {
-                Helper.ReverseJaggedArray(Dimension);
-            }
+            if (reversed) Helper.ReverseJaggedArray(Dimension);
 
             if (rotated) {
                 Dimension = Helper.Rotate(Dimension);
@@ -151,6 +172,12 @@ namespace TBG___2048
             return equal;
         }
 
+        /// <summary>
+        /// Wraps the summing and the shifting.
+        /// </summary>
+        /// <param name="row">Array</param>
+        /// <param name="reversed"></param>
+        /// <returns>New array</returns>
         private int[] Operate(int[] row, bool reversed)
         {
             row = ShiftArray(row);
@@ -185,34 +212,34 @@ namespace TBG___2048
             Console.WriteLine(" #================================#");
         }
 
+        /// <summary>
+        /// Play the game.
+        /// </summary>
         public void Play()
         {
             while(!IsOver()) {
                 var input = Console.ReadKey(true).Key;
                 switch (input) {
                     case ConsoleKey.LeftArrow:
-                        if(Move("LEFT"))
-                            Show();
+                        if(Move("LEFT")) Show();
                         break;
                     case ConsoleKey.UpArrow:
-                        if(Move("UP"))
-                            Show();
+                        if(Move("UP")) Show();
                         break;
                     case ConsoleKey.RightArrow:
-                        if(Move("RIGHT"))
-                            Show();
+                        if(Move("RIGHT")) Show();
                         break;
                     case ConsoleKey.DownArrow:
-                        if(Move("DOWN"))
-                            Show();
+                        if(Move("DOWN")) Show();
                         break;
                     case ConsoleKey.Q:
                         Environment.Exit(0);
                         break;
-                    case ConsoleKey.R:
-                        Dimension = Helper.Rotate(Dimension);
-                        Show();
-                        break;
+                    // For debugging purposes
+                    // case ConsoleKey.R:
+                    //    Dimension = Helper.Rotate(Dimension);
+                    //    Show();
+                    //    break;
                     default:
                         // Do nothing
                         break;

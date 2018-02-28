@@ -8,15 +8,10 @@ namespace TBG___2048
 {
     static class Helper
     {
-        public static int GetColumnLength(int[][] jaggedArray, int columnIndex)
-        {
-            int count = 0;
-            foreach (int[] row in jaggedArray) {
-                if (columnIndex < row.Length) count++;
-            }
-            return count;
-        }
-
+        /// <summary>
+        /// Reverse the jagged array horizontally.
+        /// </summary>
+        /// <param name="array">Desired array.</param>
         public static void ReverseJaggedArray(int[][] array)
         {
             for (int rowIndex = 0; rowIndex <= (array.GetUpperBound(0)); rowIndex++) {
@@ -28,6 +23,11 @@ namespace TBG___2048
             }
         }
 
+        /// <summary>
+        /// Transposes an array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns>Transposed array.</returns>
         public static int[][] Transpose(int[][] array)
         {
             var newArray = CreateJaggedArray(4);
@@ -39,6 +39,11 @@ namespace TBG___2048
             return newArray;
         }
 
+        /// <summary>
+        /// Rotates an array 90 degrees.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
         public static int[][] Rotate(int[][] array)
         {
             array = Transpose(array);
@@ -46,6 +51,11 @@ namespace TBG___2048
             return array;
         }
 
+        /// <summary>
+        /// Creates a jagged array.
+        /// </summary>
+        /// <param name="len"></param>
+        /// <returns></returns>
         public static int[][] CreateJaggedArray(int len)
         {
             int[][] array = new int[len][];
