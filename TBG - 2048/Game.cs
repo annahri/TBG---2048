@@ -193,6 +193,9 @@ namespace TBG___2048
         private void Show(string format = "{0,6}")
         {
             bool status = IsOver();
+            if (status) {
+                Console.BackgroundColor = ConsoleColor.DarkRed;
+            }
             Console.Title = "2048 Game - Console Application | " + (status ? "No moves left" : $"Score : {Score}");
             Console.Clear();
             Console.WriteLine(" #================================#");
@@ -245,6 +248,7 @@ namespace TBG___2048
                         break;
                 }
             }
+            Console.Beep(1500, 2000);
             Console.ReadLine();
         }
     }
