@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
+using Cons = Colorful.Console;
 
 namespace TBG___2048
 {
@@ -16,8 +18,8 @@ namespace TBG___2048
             Initiate(Dimension, 4);
             GiveNumbers(Dimension, new int[] { 2, 4 }, 2);
 
-            Show();
-            Console.Write("  Press the arrow key...");
+            ShowBoxed();
+            Cons.Write("  Press the arrow key...");
         }
 
         /// <summary>
@@ -186,6 +188,18 @@ namespace TBG___2048
             return row;
         }
 
+        private List<int> GetValues()
+        {
+            var vals = new List<int>();
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    var val = Dimension[i][j];
+                    vals.Add(val);
+                }
+            }
+            return vals;
+        }
+
         /// <summary>
         /// Prints the table according to format.
         /// </summary>
@@ -215,6 +229,89 @@ namespace TBG___2048
             Console.WriteLine(" #================================#");
         }
 
+        private void ShowBoxed(int pad = 3)
+        {
+            var gap = "";
+            gap = gap.PadRight(pad, ' ');
+
+            var len = 7;
+            var values = GetValues().ToArray();
+            var status = IsOver();
+            Console.Title = "2048 Game - Console Application | " + (status ? "No moves left" : $"Score : {Score}");
+            Console.Clear();
+            Cons.ResetColor();
+
+            // Heading
+            Cons.WriteAscii(" 2048", Color.DarkOrange);
+            Cons.WriteLineFormatted("   Score {0}", Color.DarkCyan, Color.DarkOrange, Score);
+
+            #region Draw boxes
+            Cons.Write(gap);
+            Cons.Write("┌");
+            for (int i = 0; i < 4 * len; i++) {
+                if (i == 0) continue;
+                if (i % len != 0) Cons.Write("─");
+                else Cons.Write("┬");
+            }
+            Cons.Write("┐\n");
+
+            for (int i = 0; i < 4; i++) {
+                Cons.Write(gap);
+                for (int j = 0; j < 4; j++) {
+                    var separator = "│";
+                    var str = "";
+
+                    var blanks = len - 1;
+                    var value = Dimension[i][j];
+                    var digits = value.ToString().Length;
+                    var spaces = blanks - digits;
+
+                    if (value != 0)
+                        str = str.PadRight(spaces -1, ' ') + value + ' ';
+                    else
+                        str = str.PadRight(blanks, ' ');
+
+
+                    Cons.Write(separator);
+                    Cons.ForegroundColor = System.Drawing.Color.White;
+                    if (value != 0) {
+                        var r = value % 255;
+                        var g = (120 + r) % 255;
+                        if (g >= 200) Cons.ForegroundColor = System.Drawing.Color.Black;
+                        Cons.BackgroundColor = System.Drawing.Color.FromArgb(r, g, 50);
+                    }
+                    Cons.Write(str);
+                    Cons.ResetColor();
+
+                    if (j == 3) Cons.Write(separator);
+                }
+
+                Console.WriteLine();
+                Cons.Write(gap);
+                if (i != 3) {
+                    for (int k = 0; k < 4 * len; k++) {
+                        if (k == 0) Cons.Write("├");
+
+                        if (k % len != 0) Cons.Write("─");
+                        else if (k != 0) Cons.Write("┼");
+
+                        if (k == 4 * len - 1) Cons.Write("┤");
+                    }
+                    Console.WriteLine();
+                }
+            }
+
+            Cons.Write("└");
+            for (int i = 0; i < 4 * len; i++) {
+                if (i == 0) continue;
+                if (i % len != 0) Cons.Write("─");
+                else Cons.Write("┴");
+            }
+            Cons.Write("┘\n");
+            #endregion
+
+        }
+
         /// <summary>
         /// Play the game.
         /// </summary>
@@ -224,19 +321,22 @@ namespace TBG___2048
                 var input = Console.ReadKey(true).Key;
                 switch (input) {
                     case ConsoleKey.LeftArrow:
-                        if(Move("LEFT")) Show();
+                        if(Move("LEFT")) ShowBoxed();
                         break;
                     case ConsoleKey.UpArrow:
-                        if(Move("UP")) Show();
+                        if(Move("UP")) ShowBoxed();
                         break;
                     case ConsoleKey.RightArrow:
-                        if(Move("RIGHT")) Show();
+                        if(Move("RIGHT")) ShowBoxed();
                         break;
                     case ConsoleKey.DownArrow:
-                        if(Move("DOWN")) Show();
+                        if(Move("DOWN")) ShowBoxed();
                         break;
                     case ConsoleKey.Q:
                         Environment.Exit(0);
+                        break;
+                    case ConsoleKey.Spacebar:
+                        ShowBoxed();
                         break;
                     // For debugging purposes
                     // case ConsoleKey.R:
