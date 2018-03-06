@@ -4,10 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TBG___2048
+namespace HelperClass
 {
-    static class Helper
+    public static class Helper
     {
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
+        public static void Initiate(int[][] array, int val)
+        {
+            for (int i = 0; i < val; i++) {
+                array[i] = new int[val];
+            }
+        }
+
         /// <summary>
         /// Reverse the jagged array horizontally.
         /// </summary>
@@ -40,6 +53,18 @@ namespace TBG___2048
         }
 
         /// <summary>
+        /// Shift the elements of array to the left.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static int[] ShiftArray(int[] array)
+        {
+            var nonZeros = array.Where(x => x != 0);
+            var amountofZeros = array.Count() - nonZeros.Count();
+            return nonZeros.Concat(Enumerable.Repeat(0, amountofZeros)).ToArray();
+        }
+
+        /// <summary>
         /// Rotates an array 90 degrees.
         /// </summary>
         /// <param name="array"></param>
@@ -50,6 +75,25 @@ namespace TBG___2048
             ReverseJaggedArray(array);
             return array;
         }
+
+
+        /// <summary>
+        /// Compares 
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <returns></returns>
+        public static bool Compare(int[][] array1, int[][] array2)
+        {
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    if (array1[i][j] != array2[i][j])
+                        return true;
+                }
+            }
+            return false;
+        }
+
 
         /// <summary>
         /// Creates a jagged array.

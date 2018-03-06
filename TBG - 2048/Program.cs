@@ -12,7 +12,7 @@ namespace TBG___2048
         {
             Game game = new Game();
 
-            game.Play();
+            game.MainMenu();
 
             Console.ReadKey();
         }

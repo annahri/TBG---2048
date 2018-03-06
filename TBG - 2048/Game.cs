@@ -4,22 +4,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using static HelperClass.Helper;
 using Cons = Colorful.Console;
 
 namespace TBG___2048
 {
-    class Game
+    partial class Game
     {
+        private List<Highscore> Highscores = new List<Highscore>(5);
         private int[][] Dimension = new int[4][];
         private int Score = 0;
+        private int Moves = 0;
 
         public Game()
         {
+            Initialize();
+            LoadHSFile();
+            Console.Title = "2048 Game - Console Application";
+        }
+
+        private void Initialize()
+        {
             Initiate(Dimension, 4);
             GiveNumbers(Dimension, new int[] { 2, 4 }, 2);
-
-            ShowBoxed();
-            Cons.Write("  Press the arrow key...");
+            Score = 0;
+            Moves = 0;
         }
 
         /// <summary>
@@ -39,17 +48,6 @@ namespace TBG___2048
             return true;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="array"></param>
-        /// <param name="val"></param>
-        private void Initiate(int[][] array, int val)
-        {
-            for (int i = 0; i < val; i++) {
-                array[i] = new int[val];
-            }
-        }
 
         /// <summary>
         /// 
@@ -102,29 +100,6 @@ namespace TBG___2048
             }
         }
 
-        /// <summary>
-        /// Compares 
-        /// </summary>
-        /// <param name="array1"></param>
-        /// <param name="array2"></param>
-        /// <returns></returns>
-        private bool Compare(int[][] array1, int[][] array2)
-        {
-            for (int i = 0; i < 4; i++) {
-                for (int j = 0; j < 4; j++) {
-                    if (array1[i][j] != array2[i][j])
-                        return true;
-                }
-            }
-            return false;
-        }
-
-        private int[] ShiftArray(int[] array)
-        {
-            var nonZeros = array.Where(x => x != 0);
-            var amountofZeros = array.Count() - nonZeros.Count();
-            return nonZeros.Concat(Enumerable.Repeat(0, amountofZeros)).ToArray();
-        }
         
         /// <summary>
         /// Move the numbers based on keypress.
@@ -139,21 +114,21 @@ namespace TBG___2048
             if (direction == "LEFT") {
                 // OK
             } else if (direction == "RIGHT") {
-                Helper.ReverseJaggedArray(Dimension);
+                ReverseJaggedArray(Dimension);
                 reversed = true;
                 changeBehavior = true;
             } else if (direction == "UP") {
-                Dimension = Helper.Rotate(Dimension);
-                Helper.ReverseJaggedArray(Dimension);
+                Dimension = Rotate(Dimension);
+                ReverseJaggedArray(Dimension);
                 reversed = true;
                 rotated = true;
             } else if (direction == "DOWN") {
-                Dimension = Helper.Rotate(Dimension);
+                Dimension = Rotate(Dimension);
                 rotated = true;
                 changeBehavior = true;
             }
 
-            int[][] oldArray = Helper.CreateJaggedArray(4) ;
+            int[][] oldArray = CreateJaggedArray(4) ;
             Array.Copy(Dimension, oldArray, Dimension.Length);
             
             for (int i = 0; i < 4; i++) {
@@ -163,12 +138,12 @@ namespace TBG___2048
             bool equal = Compare(oldArray, Dimension);
             if (equal) GiveNumbers(Dimension, new int[] { 2 }, 1);
 
-            if (reversed) Helper.ReverseJaggedArray(Dimension);
+            if (reversed) ReverseJaggedArray(Dimension);
 
             if (rotated) {
-                Dimension = Helper.Rotate(Dimension);
-                Dimension = Helper.Rotate(Dimension);
-                Dimension = Helper.Rotate(Dimension);
+                Dimension = Rotate(Dimension);
+                Dimension = Rotate(Dimension);
+                Dimension = Rotate(Dimension);
             }
 
             return equal;
@@ -188,168 +163,5 @@ namespace TBG___2048
             return row;
         }
 
-        private List<int> GetValues()
-        {
-            var vals = new List<int>();
-            for (int i = 0; i < 4; i++) {
-                for (int j = 0; j < 4; j++) {
-                    var val = Dimension[i][j];
-                    vals.Add(val);
-                }
-            }
-            return vals;
-        }
-
-        /// <summary>
-        /// Prints the table according to format.
-        /// </summary>
-        /// <param name="format">Default: {0,2}</param>
-        private void Show(string format = "{0,6}")
-        {
-            bool status = IsOver();
-            if (status) {
-                Console.BackgroundColor = ConsoleColor.DarkRed;
-            }
-            Console.Title = "2048 Game - Console Application | " + (status ? "No moves left" : $"Score : {Score}");
-            Console.Clear();
-            Console.WriteLine(" #================================#");
-            Console.WriteLine("  2048 Game - Console Application");
-            Console.WriteLine(" #--------------------------------#");
-            Console.WriteLine();
-            for (int i = 0; i < 4; i++) {
-                Console.Write("{0,3}", "");
-                for (int j = 0; j < 4; j++) {
-                    Console.Write(format, Dimension[i][j] == 0 ? "*" : Dimension[i][j].ToString());
-                }
-                Console.WriteLine();
-                Console.WriteLine();
-            }
-            Console.WriteLine(" #--------------------------------#");
-            Console.WriteLine((status ? "\tFinal Score: " : "\tScore: ") + $"{Score}");
-            Console.WriteLine(" #================================#");
-        }
-
-        private void ShowBoxed(int pad = 3)
-        {
-            var gap = "";
-            gap = gap.PadRight(pad, ' ');
-
-            var len = 7;
-            var values = GetValues().ToArray();
-            var status = IsOver();
-            Console.Title = "2048 Game - Console Application | " + (status ? "No moves left" : $"Score : {Score}");
-            Console.Clear();
-            Cons.ResetColor();
-
-            // Heading
-            Cons.WriteAscii(" 2048", Color.DarkOrange);
-            Cons.WriteLineFormatted("   Score {0}", Color.DarkCyan, Color.DarkOrange, Score);
-
-            #region Draw boxes
-            Cons.Write(gap);
-            Cons.Write("┌");
-            for (int i = 0; i < 4 * len; i++) {
-                if (i == 0) continue;
-                if (i % len != 0) Cons.Write("─");
-                else Cons.Write("┬");
-            }
-            Cons.Write("┐\n");
-
-            for (int i = 0; i < 4; i++) {
-                Cons.Write(gap);
-                for (int j = 0; j < 4; j++) {
-                    var separator = "│";
-                    var str = "";
-
-                    var blanks = len - 1;
-                    var value = Dimension[i][j];
-                    var digits = value.ToString().Length;
-                    var spaces = blanks - digits;
-
-                    if (value != 0)
-                        str = str.PadRight(spaces -1, ' ') + value + ' ';
-                    else
-                        str = str.PadRight(blanks, ' ');
-
-
-                    Cons.Write(separator);
-                    Cons.ForegroundColor = System.Drawing.Color.White;
-                    if (value != 0) {
-                        var r = value % 255;
-                        var g = (120 + r) % 255;
-                        if (g >= 200) Cons.ForegroundColor = System.Drawing.Color.Black;
-                        Cons.BackgroundColor = System.Drawing.Color.FromArgb(r, g, 50);
-                    }
-                    Cons.Write(str);
-                    Cons.ResetColor();
-
-                    if (j == 3) Cons.Write(separator);
-                }
-
-                Console.WriteLine();
-                Cons.Write(gap);
-                if (i != 3) {
-                    for (int k = 0; k < 4 * len; k++) {
-                        if (k == 0) Cons.Write("├");
-
-                        if (k % len != 0) Cons.Write("─");
-                        else if (k != 0) Cons.Write("┼");
-
-                        if (k == 4 * len - 1) Cons.Write("┤");
-                    }
-                    Console.WriteLine();
-                }
-            }
-
-            Cons.Write("└");
-            for (int i = 0; i < 4 * len; i++) {
-                if (i == 0) continue;
-                if (i % len != 0) Cons.Write("─");
-                else Cons.Write("┴");
-            }
-            Cons.Write("┘\n");
-            #endregion
-
-        }
-
-        /// <summary>
-        /// Play the game.
-        /// </summary>
-        public void Play()
-        {
-            while(!IsOver()) {
-                var input = Console.ReadKey(true).Key;
-                switch (input) {
-                    case ConsoleKey.LeftArrow:
-                        if(Move("LEFT")) ShowBoxed();
-                        break;
-                    case ConsoleKey.UpArrow:
-                        if(Move("UP")) ShowBoxed();
-                        break;
-                    case ConsoleKey.RightArrow:
-                        if(Move("RIGHT")) ShowBoxed();
-                        break;
-                    case ConsoleKey.DownArrow:
-                        if(Move("DOWN")) ShowBoxed();
-                        break;
-                    case ConsoleKey.Q:
-                        Environment.Exit(0);
-                        break;
-                    case ConsoleKey.Spacebar:
-                        ShowBoxed();
-                        break;
-                    // For debugging purposes
-                    // case ConsoleKey.R:
-                    //    Dimension = Helper.Rotate(Dimension);
-                    //    Show();
-                    //    break;
-                    default:
-                        // Do nothing
-                        break;
-                }
-            }
-            Console.Beep(1500, 2000);
-            Console.ReadLine();
-        }
     }
 }
