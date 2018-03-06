@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.IO;
 using static HelperClass.Helper;
 using Cons = Colorful.Console;
 
@@ -19,7 +20,8 @@ namespace TBG___2048
         public Game()
         {
             Initialize();
-            LoadHSFile();
+            if (File.Exists("highscores.xml")) LoadHSFile();
+            else InitHSFile();
             Console.Title = "2048 Game - Console Application";
         }
 
