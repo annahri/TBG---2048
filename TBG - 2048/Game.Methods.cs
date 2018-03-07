@@ -202,7 +202,7 @@ namespace TBG___2048
 
             var len = 7;
             var status = IsOver();
-            var hs = Highscores.Max(s => s.Score);
+            var hs = (Highscores.Any() ? Highscores.Max(s => s.Score) : 0);
 
 
             Title(true, status, " 2048");
