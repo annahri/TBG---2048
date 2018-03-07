@@ -9,6 +9,9 @@ A clone of 2048 in a console application.
 * The in-game borders will turn to green after a cell has a value of 8.
 
 # Todo
+* later
+
+
 
 ---
 Inspired by Daniel Shiffman
