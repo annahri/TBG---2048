@@ -10,6 +10,6 @@ The in-game borders will turn to green after a cell has a value of 8.
 
 # Todo
 
-
+# 
 Inspired by Daniel Shiffman
 https://www.youtube.com/watch?v=3iYvT8TBIro
